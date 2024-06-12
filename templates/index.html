@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEW STYLE</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <ul id="nav-menu">
+                <li><a href="/login">Login</a></li>
+                <li><a href="/registra">Register</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <h1>Bienvenido a Nuestra Tienda en Línea</h1>
+    <div id="product-list"></div>
+    <script src="/static/js/app.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('token');
+            if (token) {
+                fetch('/me', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                })
+                .then(response => response.json())
+                .then(user => {
+                    if (user) {
+                        updateUserMenu(user);
+                    }
+                });
+            }
+        });
+
+        function updateUserMenu(user) {
+            const navMenu = document.getElementById('nav-menu');
+            navMenu.innerHTML = `
+                <li><button onclick="showUserInfo()">User: ${user.username}</button></li>
+                <li><button onclick="logout()">Logout</button></li>
+            `;
+        }
+
+        function showUserInfo() {
+            const token = localStorage.getItem('token');
+            fetch('/me', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(response => response.json())
+            .then(user => {
+                alert(`User ID: ${user.user_id}\nEmail: ${user.email}`);
+            });
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            window.location.href = '/';
+        }
+    </script>
+</body>
+</html>

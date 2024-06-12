@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insert Product</title>
+</head>
+<body>
+    <h1>Insert Product</h1>
+    <form id="productForm" action="/product/" method="post">
+        <label for="product_id">product_id:</label>
+        <input type="number" id="product_id" name="product_id" required><br><br>
+
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required><br><br>
+    
+        <label for="img">Image URL:</label>
+        <input type="text" id="img" name="img" required><br><br>
+    
+        <label for="description">Description:</label>
+        <textarea id="description" name="description" required></textarea><br><br>
+    
+        <label for="company">Company:</label>
+        <input type="text" id="company" name="company" required><br><br>
+    
+        <label for="price">Price:</label>
+        <input type="number" id="price" name="price" step="0.01" required><br><br>
+    
+        <label for="units">Units:</label>
+        <input type="number" id="units" name="units" required><br><br>
+
+        <label for="subcategory_id">subcategory_id:</label>
+        <input type="number" id="subcategory_id" name="subcategory_id" required><br><br>
+    
+        <button type="button" onclick="submitForm()">Submit</button>
+    </form>
+    
+    <script>
+        function submitForm() {
+            const formData = {
+                product_id: parseInt(document.getElementById("product_id").value),
+                name: document.getElementById("name").value,
+                img: document.getElementById("img").value,
+                description: document.getElementById("description").value,
+                company: document.getElementById("company").value,
+                price: parseFloat(document.getElementById("price").value),
+                units: parseInt(document.getElementById("units").value),
+                subcategory_id: parseInt(document.getElementById("subcategory_id").value),
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            };
+
+            fetch('/product/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                // Aquí puedes manejar la respuesta del servidor, por ejemplo, redireccionar a otra página
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</body>
+</html>

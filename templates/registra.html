@@ -1,0 +1,76 @@
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Register - Online Store</title>
+        <link rel="stylesheet" href="static/css/style.css">
+    </head>
+    <body>
+        <header>
+            <nav>
+                <ul>
+                    <li><a href="/login">Login</a></li>
+                    <li><a href="/register">Register</a></li>
+                </ul>
+            </nav>
+        </header>
+        <div id="app">
+            <h1>Register</h1>
+            <form id="registerForm">
+                <div>
+                    <label for="user_id">user_id:</label>
+                    <input type="number" id="user_id" name="user_id" required><br><br>
+                </div>
+                <div>
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div>
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div>
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="button" onclick="submitForm()">Register</button>
+            </form>
+        </div>
+
+        <script>
+            async function submitForm() {
+                const formData = {
+                    user_id: document.getElementById("user_id").value,
+                    username: document.getElementById("username").value,
+                    email: document.getElementById("email").value,
+                    password: document.getElementById("password").value,
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString()
+                };
+
+                try {
+                    const response = await fetch('/users', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(formData)
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('Registration failed');
+                    }
+                    
+                    console.log('Registration successful!');
+                    alert('Registration successful!');
+                    window.location.href = '/login'; // Redirect to login page
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Failed to register.');
+                }
+            }
+
+        </script>
+    </body>
+    </html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Management</title>
+    <!-- <link rel="stylesheet" href="static/css/style.css"> -->
+</head>
+<body>
+    <h1>Product Management</h1>
+    <a href="/inserta">Add New Product</a>
+    <div id="app">
+        <table>
+            <thead>
+                <tr>
+                    <th>Product_id</th>
+                    <th>Name</th>
+                    <th>Image</th>
+                    <th>Description</th>
+                    <th>Company</th>
+                    <th>Price</th>
+                    <th>Units</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="product-list">
+                <!-- Aquí se insertarán los datos de los productos -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const response = await fetch('/products');
+                const products = await response.json();
+                console.log(products);
+                const productList = document.getElementById('product-list');
+                products.forEach(product => {
+                    const productRow = document.createElement('tr');
+                    const imgSrc = product.img; // The full path is already stored in the database
+                    
+                    productRow.innerHTML = `
+                        <td>${product.product_id}</td>
+                        <td>${product.name}</td>
+                        <td>${imgSrc ? `<img src="${imgSrc}" alt="${product.name}" width="50">` : ''}</td>
+                        <td>${product.description}</td>
+                        <td>${product.company}</td>
+                        <td>${product.price}</td>
+                        <td>${product.units}</td>
+                        <td>
+                            <a href="/edit?id=${product.product_id}">Edit</a>
+                            <button onclick="deleteProduct(${product.product_id})">Delete</button>
+                        </td>
+                    `;
+                    productList.appendChild(productRow);
+                });
+            } catch (error) {
+                console.error('Error fetching products:', error);
+            }
+        });
+
+        async function deleteProduct(productId) {
+            try {
+                const response = await fetch(`/delete/${productId}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    alert('Product deleted successfully!');
+                    location.reload(); // Refresh the page to update the product list
+                } else {
+                    alert('Failed to delete product.');
+                }
+            } catch (error) {
+                console.error('Error deleting product:', error);
+                alert('Failed to delete product.');
+            }
+        }
+    </script>
+</body>
+</html>

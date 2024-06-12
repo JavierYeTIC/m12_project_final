@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Product</title>
+    <!-- <link rel="stylesheet" href="static/css/style.css"> -->
+</head>
+<body>
+    <h1>Edit Product</h1>
+    <form id="editProductForm">
+        <input type="hidden" id="product_id" name="product_id" required>
+    
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required><br><br>
+    
+        <label for="img">Image URL:</label>
+        <input type="text" id="img" name="img" required><br><br>
+        
+        <label for="description">Description:</label>
+        <textarea id="description" name="description" required></textarea><br><br>
+        
+        <label for="company">Company:</label>
+        <input type="text" id="company" name="company" required><br><br>
+        
+        <label for="price">Price:</label>
+        <input type="number" id="price" name="price" step="0.01" required><br><br>
+        
+        <label for="units">Units:</label>
+        <input type="number" id="units" name="units" required><br><br>
+    
+        <label for="subcategory_id">Subcategory ID:</label>
+        <input type="number" id="subcategory_id" name="subcategory_id" required><br><br>
+        
+        <button type="button" onclick="submitForm()">Update</button>
+    </form>
+    
+
+    <script>
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const productId = urlParams.get('id');
+            console.log(productId);
+
+            if (productId) {
+                const response = await fetch(`/product/${productId}`);
+                const product = await response.json();
+                
+                // Populate form with product data
+                document.getElementById('product_id').value = product.product_id;
+                document.getElementById('name').value = product.name;
+                document.getElementById('description').value = product.description;
+                document.getElementById('company').value = product.company;
+                document.getElementById('price').value = product.price;
+                document.getElementById('units').value = product.units;
+                document.getElementById('subcategory_id').value = product.subcategory_id;
+                document.getElementById('img').value = product.img;
+            }
+        });
+
+        function submitForm() {
+            const form = document.getElementById("editProductForm");
+            const formData = {
+                product_id: parseInt(document.getElementById("product_id").value),
+                name: document.getElementById("name").value,
+                img: document.getElementById("img").value, // Modificación: Recoger la URL de la imagen del campo de entrada de texto
+                description: document.getElementById("description").value,
+                company: document.getElementById("company").value,
+                price: parseFloat(document.getElementById("price").value),
+                units: parseInt(document.getElementById("units").value),
+                subcategory_id: parseInt(document.getElementById("subcategory_id").value),
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            };
+
+            fetch(`/product/${formData.product_id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                alert('Product updated successfully!');
+                window.location.href = '/crud'; // Redirect to product list page
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to update product.');
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Online Store</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="/login">Login</a></li>
+                <li><a href="/registra">Register</a></li>
+            </ul>
+        </nav>
+    </header>
+    <div id="app">
+        <h1>Login</h1>
+        <form id="loginForm">
+            <div>
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div>
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="button" onclick="submitForm()">Login</button>
+        </form>
+    </div>
+
+    <script>
+        async function submitForm() {
+            const formData = {
+                email: document.getElementById("email").value,
+                password: document.getElementById("password").value,
+            };
+
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    localStorage.setItem('token', data.access_token);
+                    alert('Login successful!');
+                    window.location.href = '/'; // Redirect to home page
+                } else {
+                    throw new Error('Login failed');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to login.');
+            }
+        }
+    </script>
+</body>
+</html>
