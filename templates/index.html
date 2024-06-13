@@ -4,65 +4,46 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NEW STYLE</title>
-    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/style.css">  <!-- Estilo CSS para tu página -->
 </head>
 <body>
     <header>
         <nav>
             <ul id="nav-menu">
-                <li><a href="/login">Login</a></li>
-                <li><a href="/registra">Register</a></li>
+                <li><a href="/login">Login</a></li>  <!-- Enlace para ir a la página de login -->
+                <li><a href="/registra">Register</a></li>  <!-- Enlace para ir a la página de registro -->
             </ul>
         </nav>
     </header>
 
     <h1>Bienvenido a Nuestra Tienda en Línea</h1>
-    <div id="product-list"></div>
-    <script src="/static/js/app.js"></script>
+    <div id="product-list">
+    </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const token = localStorage.getItem('token');
-            if (token) {
-                fetch('/me', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                })
-                .then(response => response.json())
-                .then(user => {
-                    if (user) {
-                        updateUserMenu(user);
-                    }
-                });
-            }
+    <script >
+        document.addEventListener('DOMContentLoaded', async () => {
+            const response = await fetch('/products');
+            const products = await response.json();
+
+            const productList = document.getElementById('product-list');
+            products.forEach(product => {
+                const productItem = document.createElement('div');
+                productItem.classList.add('product-item');
+                productItem.innerHTML = `
+                    <div><img src="${product.img}" alt="${product.name}"></div>
+                    <div class="product-info">
+                        <h2>${product.name}</h2>
+                        <p>${product.description}</p>
+                        <p>Precio: $${product.price}</p>
+                        <p>Stock: ${product.units}</p>
+                    </div>
+                `;
+                productList.appendChild(productItem);
+                console.log(product.img);
+            });
         });
 
-        function updateUserMenu(user) {
-            const navMenu = document.getElementById('nav-menu');
-            navMenu.innerHTML = `
-                <li><button onclick="showUserInfo()">User: ${user.username}</button></li>
-                <li><button onclick="logout()">Logout</button></li>
-            `;
-        }
+    </script>  <!-- Script principal de tu aplicación -->
 
-        function showUserInfo() {
-            const token = localStorage.getItem('token');
-            fetch('/me', {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            })
-            .then(response => response.json())
-            .then(user => {
-                alert(`User ID: ${user.user_id}\nEmail: ${user.email}`);
-            });
-        }
-
-        function logout() {
-            localStorage.removeItem('token');
-            window.location.href = '/';
-        }
-    </script>
 </body>
 </html>

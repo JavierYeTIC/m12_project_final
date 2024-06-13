@@ -50,7 +50,7 @@
                 if (response.ok) {
                     localStorage.setItem('token', data.access_token);
                     alert('Login successful!');
-                    window.location.href = '/'; // Redirect to home page
+                    window.location.href = '/indexLogin'; // Redirect to home page
                 } else {
                     throw new Error('Login failed');
                 }

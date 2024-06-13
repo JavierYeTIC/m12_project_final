@@ -4,7 +4,6 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from typing import List
 from fastapi_login import LoginManager
-from fastapi_login.exceptions import InvalidCredentialsException
 import datetime
 from db import clientPS, productDB, userDB
 from model.Product import Product
@@ -16,8 +15,8 @@ templates = Jinja2Templates(directory="templates")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 app.mount("/img", StaticFiles(directory="img"), name="img")
 
-SECRET = "your-secret-key"  # Define el SECRET antes de usarlo
-manager = LoginManager(SECRET, token_url="/login")
+SECRET = "my-super-secure-secret-key"
+manager = LoginManager(SECRET, token_url="/login", use_cookie=True)
 
 try:
     conn = clientPS.client()
@@ -27,20 +26,34 @@ except Exception as e:
 #(1, 'informatica', current_timestamp, current_timestamp);
 # uvicorn main:app --reload
 
-# Load users from DB
+# Cargar usuarios desde la base de datos
 usersMemo = userDB.load_users_from_db()
 
+# Definir la función user_loader
 @manager.user_loader
 def load_user(email: str):
-    return usersMemo.get(email)
+    # Implementación para cargar el usuario desde donde sea que esté almacenado en tu aplicación
+    # Aquí deberías cargar el usuario basado en el email u otro identificador único
+    return {"email": email, "username": "username"}
 
 @app.get("/", response_class=HTMLResponse)
 def read_root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 @app.get("/me")
-def get_me(user=Depends(manager)):
-    return user
+def get_me(user: dict = Depends(manager)):
+    try:
+        if user is not None:
+            return user
+        else:
+            raise HTTPException(status_code=401, detail="User not authenticated")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/indexLogin", response_class=HTMLResponse)
+def login_page(request: Request):
+    return templates.TemplateResponse("indexLogin.html", {"request": request})
 
 @app.get("/login", response_class=HTMLResponse)
 def login_page(request: Request):
@@ -78,10 +91,9 @@ def login(credentials: LoginRequest = Body(...)):
     password = credentials.password
 
     if userDB.comprova(email, password):
-        access_token = manager.create_access_token(data={'sub': email})
-        return {"access_token": access_token, "token_type": "bearer"}
+       return {"message": "Login successful", "email": email}
     else:
-        raise InvalidCredentialsException
+        raise HTTPException(status_code=401, detail="Invalid email or password")
 
 @app.get("/products")
 def get_all_products():
