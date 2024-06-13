@@ -60,7 +60,7 @@
             .then(response => response.json())
             .then(data => {
                 console.log(data);
-                // Aquí puedes manejar la respuesta del servidor, por ejemplo, redireccionar a otra página
+                window.location.href = '/crud';
             })
             .catch(error => {
                 console.error('Error:', error);
